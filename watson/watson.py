@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# fmt: off
+# isort:skip_file
 
 import datetime
 from functools import reduce
@@ -287,6 +289,15 @@ class Watson(object):
         self.current = new_frame
         return self.current
 
+    def stop_current(self, current, stop_at, note, **kwargs):
+        frame = self.frames.add(
+            current['project'], current['start'], stop_at, tags=current['tags'],
+            note=note, **kwargs
+        )
+        self.current = None
+
+        return frame
+
     def stop(self, stop_at=None, note=None):
         if not self.is_started:
             raise WatsonError("No project started.")
@@ -310,13 +321,7 @@ class Watson(object):
         elif old.get('note') is not None:
             print('Overwriting old note:\n>> {}'.format(old.get('note')))
 
-        frame = self.frames.add(
-            old['project'], old['start'], stop_at, tags=old['tags'],
-            note=note
-        )
-
-        self.current = None
-
+        frame = self.stop_current(old, stop_at, note)
         return frame
 
     def cancel(self):

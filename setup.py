@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# fmt: off
+# isort:skip_file
 """Setup file for the Watson distribution."""
 
 from os.path import join
@@ -47,6 +49,9 @@ setup(
     long_description=readme,
     install_requires=parse_requirements('requirements.txt'),
     tests_require=parse_requirements('requirements-dev.txt'),
+    extras_require={
+        'jira': ['jira']
+    },
     entry_points={
         'console_scripts': [
             'watson = watson.__main__:cli',

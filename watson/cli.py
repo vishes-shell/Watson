@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# fmt: off
+# isort:skip_file
 
 import datetime
 import itertools
@@ -1139,6 +1141,8 @@ def log(watson, current, reverse, from_, to, projects, tags, year, month, week,
                     stop=style('time', '{:HH:mm}'.format(frame.stop)),
                     id=style('short_id', frame.id)
                     ))
+            if frame.jira_worklog:
+                _print("\t{}jira_worklog: {}".format(" "*9, frame.jira_worklog))
             if frame.note is not None and frame.note != '' and show_notes:
                 _print(u"\t{}{}".format(" "*9, format_note(frame.note)))
 

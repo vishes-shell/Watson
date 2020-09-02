@@ -1,15 +1,17 @@
+# fmt: off
+# isort:skip_file
 import uuid
-
-import arrow
 
 from collections import namedtuple
 
-HEADERS = ('start', 'stop', 'project', 'id', 'tags', 'updated_at', 'note')
+import arrow
+
+HEADERS = ('start', 'stop', 'project', 'id', 'tags', 'updated_at', 'note', 'jira_worklog')
 
 
 class Frame(namedtuple('Frame', HEADERS)):
     def __new__(cls, start, stop, project, id, tags=None, updated_at=None,
-                note=None):
+                note=None, jira_worklog=None):
         try:
             if not isinstance(start, arrow.Arrow):
                 start = arrow.get(start)
@@ -32,7 +34,7 @@ class Frame(namedtuple('Frame', HEADERS)):
             tags = []
 
         return super(Frame, cls).__new__(
-            cls, start, stop, project, id, tags, updated_at, note
+            cls, start, stop, project, id, tags, updated_at, note, jira_worklog
         )
 
     def dump(self):
@@ -41,7 +43,7 @@ class Frame(namedtuple('Frame', HEADERS)):
         updated_at = self.updated_at.timestamp
 
         return (start, stop, self.project, self.id, self.tags, updated_at,
-                self.note)
+                self.note, self.jira_worklog)
 
     @property
     def day(self):
@@ -139,11 +141,11 @@ class Frames(object):
         return frame
 
     def new_frame(self, project, start, stop, tags=None, id=None,
-                  updated_at=None, note=None):
+                  updated_at=None, note=None, jira_worklog=None):
         if not id:
             id = uuid.uuid4().hex
         return Frame(start, stop, project, id, tags=tags,
-                     updated_at=updated_at, note=note)
+                     updated_at=updated_at, note=note, jira_worklog=jira_worklog)
 
     def dump(self):
         return tuple(frame.dump() for frame in self._rows)
