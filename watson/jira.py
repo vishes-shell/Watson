@@ -54,6 +54,8 @@ class JiraMixin:
             self.jira_client.worklog(frame.project, frame.jira_worklog).delete()
 
     def stop_current(self, current, stop_at, note):
+        stop_kwargs = {"current": current, "stop_at": stop_at, "note": note}
+
         if self.jira_track_time_required(current["project"], current["tags"]):
             review_tag = self.config.get("jira", "review_tag", default="review")
 
@@ -64,5 +66,6 @@ class JiraMixin:
             worklog = self.jira_add_worklog(
                 current["project"], current["start"], stop_at, comment=comment
             )
+            stop_kwargs["jira_worklog"] = worklog.id
 
-        return super().stop_current(current, stop_at, note, jira_worklog=worklog.id)
+        return super().stop_current(**stop_kwargs)
