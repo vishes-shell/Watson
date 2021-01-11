@@ -1,7 +1,6 @@
 import re
 
 from jira import JIRA, Worklog
-
 from watson.watson import ConfigurationError
 
 
@@ -43,10 +42,10 @@ class JiraMixin:
 
         return JIRA(server, basic_auth=(user, token))
 
-    def jira_add_worklog(self, project, start, stop, note):
+    def jira_add_worklog(self, project, start, stop, comment=None):
         seconds_spent = int((stop - start).total_seconds())
         worklog = self.jira_client.add_worklog(
-            project, timeSpentSeconds=seconds_spent, comment=note
+            project, timeSpentSeconds=seconds_spent, comment=comment
         )
         return worklog
 
@@ -56,7 +55,14 @@ class JiraMixin:
 
     def stop_current(self, current, stop_at, note):
         if self.jira_track_time_required(current["project"], current["tags"]):
+            review_tag = self.config.get("jira", "review_tag", default="review")
+
+            comment = None
+            if review_tag in current["tags"]:
+                comment = self.config.get("jira", "review_comment", default="review")
+
             worklog = self.jira_add_worklog(
-                current["project"], current["start"], stop_at, note
+                current["project"], current["start"], stop_at, comment=comment
             )
+
         return super().stop_current(current, stop_at, note, jira_worklog=worklog.id)
